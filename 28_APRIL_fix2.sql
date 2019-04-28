@@ -169,4 +169,4 @@ INSERT INTO Investment_transaction values ('I222');
 INSERT INTO Portfolio_action VALUES ('I222', 5, 'JohnWick', '1999-3-5', 'buy', 5, 10);
 INSERT INTO deposit_trans VALUES ('D111', 'JohnWick', '1344-6-7', 599);
 INSERT INTO Owns VALUES (5, 'JohnWick', 10);
-INSERT INTO Prefers VALUES (5, 'JohnWick', 0.4);
+INSERT INTO Prefers VALUES (5, 'JohnWick', 0.7);
