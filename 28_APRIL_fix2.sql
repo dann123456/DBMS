@@ -12,14 +12,6 @@ DROP TABLE IF EXISTS Administrator cascade;
 DROP TABLE IF EXISTS MutualFund cascade;
 DROP TABLE IF EXISTS Closing_price cascade;
 
--- Location_id to location
--- MF's company_id now can not be null
--- prefer's percentage fix
--- location's postcode fix ???
--- each FK now has its own ON DELETE CASCADE
--- trigger granularity changed to "statement" level
--- remove NULL from prefer's percentage fix
-
 CREATE TABLE "User" (
   login VARCHAR(20),
   address VARCHAR(30),
@@ -80,7 +72,8 @@ CREATE TABLE Closing_price (
   PRIMARY KEY (p_date, symbol),
   FOREIGN KEY (symbol) REFERENCES MutualFund(symbol) ON DELETE CASCADE
 );
-
+-- CHECK constraint on trans_id ensures that the transactions in Deposit_transaction
+-- and Investment_transaction are disjoint 
 CREATE TABLE Deposit_transaction (
   trans_id VARCHAR(20) CHECK (trans_id like 'D%'),
   PRIMARY KEY (trans_id)
@@ -169,4 +162,4 @@ INSERT INTO Investment_transaction values ('I222');
 INSERT INTO Portfolio_action VALUES ('I222', 5, 'JohnWick', '1999-3-5', 'buy', 5, 10);
 INSERT INTO deposit_trans VALUES ('D111', 'JohnWick', '1344-6-7', 599);
 INSERT INTO Owns VALUES (5, 'JohnWick', 10);
-INSERT INTO Prefers VALUES (5, 'JohnWick', 0.7);
+INSERT INTO Prefers VALUES (5, 'JohnWick', 0.4);
