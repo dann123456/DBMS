@@ -1,8 +1,7 @@
 DROP TABLE IF EXISTS Company cascade;
 DROP TABLE IF EXISTS "User" cascade;
 DROP TABLE IF EXISTS location cascade;
-DROP TABLE IF EXISTS Deposit_transaction cascade;
-DROP TABLE IF EXISTS Investment_transaction cascade;
+DROP TABLE IF EXISTS Transaction cascade;
 DROP TABLE IF EXISTS Portfolio_action cascade;
 DROP TABLE IF EXISTS deposit_trans cascade;
 DROP TABLE IF EXISTS Owns cascade;
@@ -11,6 +10,11 @@ DROP TABLE IF EXISTS Customer cascade;
 DROP TABLE IF EXISTS Administrator cascade;
 DROP TABLE IF EXISTS MutualFund cascade;
 DROP TABLE IF EXISTS Closing_price cascade;
+
+-- Portfolio's amount added NOT NULL after check constraint
+-- Updated insert statement for Location so that postcode was in NSW
+-- Added amount of 50 to insert statement for Portfolio_action 
+-- Added check constraint to Portfolio action CHECK (action = 'buy' OR action = 'sell')
 
 CREATE TABLE "User" (
   login VARCHAR(20),
@@ -43,13 +47,13 @@ CREATE TABLE Company (
 );
 
 CREATE TABLE Location (
-  location VARCHAR(10),
+  location VARCHAR(50),
   company_id VARCHAR(10),
   city VARCHAR(20),
   postcode INT CHECK (postcode < 10000 and postcode > 999),
   state VARCHAR(3) DEFAULT 'NSW',
   CHECK ( state IN ('NSW', 'VIC', 'SA', 'QLD', 'WA', 'NT', 'ACT', 'TAS')),
-  PRIMARY KEY (location, company_id), -- LECTURE 3 PAGE 42
+  PRIMARY KEY (location, company_id),
   FOREIGN KEY (company_id) REFERENCES Company(company_id) ON DELETE CASCADE
 );
 
@@ -72,15 +76,9 @@ CREATE TABLE Closing_price (
   PRIMARY KEY (p_date, symbol),
   FOREIGN KEY (symbol) REFERENCES MutualFund(symbol) ON DELETE CASCADE
 );
--- CHECK constraint on trans_id ensures that the transactions in Deposit_transaction
--- and Investment_transaction are disjoint 
-CREATE TABLE Deposit_transaction (
-  trans_id VARCHAR(20) CHECK (trans_id like 'D%'),
-  PRIMARY KEY (trans_id)
-);
 
-CREATE TABLE Investment_transaction (
-  trans_id VARCHAR(20) CHECK (trans_id like 'I%'),
+CREATE TABLE Transaction (
+  trans_id VARCHAR(20),
   PRIMARY KEY (trans_id)
 );
 
@@ -91,7 +89,7 @@ CREATE TABLE deposit_trans (
   amount FLOAT,
   PRIMARY KEY (trans_id, login),
   FOREIGN KEY (login) REFERENCES "User" (login) ON DELETE CASCADE, 
-  FOREIGN KEY (trans_id) REFERENCES Deposit_transaction (trans_id) ON DELETE CASCADE
+  FOREIGN KEY (trans_id) REFERENCES Transaction (trans_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Portfolio_action (
@@ -102,11 +100,11 @@ CREATE TABLE Portfolio_action (
   action VARCHAR CHECK (action = 'buy' OR action = 'sell'),
   price FLOAT,
   num_shares INT,
-  amount FLOAT,
+  amount FLOAT CHECK (amount = price * num_shares) NOT NULL,
   PRIMARY KEY (trans_id, symbol, login),
   FOREIGN KEY (symbol) REFERENCES MutualFund (symbol) ON DELETE CASCADE,
   FOREIGN KEY (login) REFERENCES "User" (login) ON DELETE CASCADE,
-  FOREIGN KEY (trans_id) REFERENCES Investment_transaction (trans_id) ON DELETE CASCADE
+  FOREIGN KEY (trans_id) REFERENCES Transaction (trans_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Owns (
@@ -127,39 +125,22 @@ CREATE TABLE Prefers (
   FOREIGN KEY (login) REFERENCES "User" (login) ON DELETE CASCADE
 );
 
---CREATE TRIGGER
-CREATE OR REPLACE FUNCTION amount_update()
-  RETURNS trigger AS
-$$
-BEGIN
-  UPDATE Portfolio_action SET amount = num_shares * price;
-  RETURN NEW;
-END;
-$$
-LANGUAGE 'plpgsql';
-
-CREATE TRIGGER t
-  AFTER INSERT OR UPDATE OF Price, num_shares
-  ON Portfolio_action
-  FOR EACH STATEMENT
-  EXECUTE PROCEDURE amount_update();
-
 
 --INSERT STATEMENTS
-INSERT INTO Company VALUES (1, 'thiscompany', 'Green', 'Newtown');
-INSERT INTO location VALUES (307088592, '1', 'Newtown', 3432);
+INSERT INTO Company VALUES (1, 'thiscompany', 'Joe', 'Smith');
+INSERT INTO location VALUES ('1 Wall St', '1', 'Newtown', 2042);
 
-INSERT INTO MutualFund VALUES (5, '1', '2019-3-4', 9300, 'here', 'fund1', 'cate1');
+INSERT INTO MutualFund VALUES (5, '1', '2019-3-4', 9300, 'low risk long term fund', 'Long-term-bonds', 'bonds');
 INSERT INTO Closing_price VALUES ('2009-4-3', '5', 4000.0);
 
-INSERT INTO "User" VALUES ('JohnWick', 'Newtown', 'pwd', 'mail', 'Wick');
+INSERT INTO "User" VALUES ('JohnWick', '1 Glebe Point Rd', 'pwd', 'mail', 'Wick');
 INSERT INTO Customer VALUES ('JohnWick', 5000);
 INSERT INTO Administrator VALUES ('JohnWick');
 
-INSERT INTO deposit_transaction values ('D111');
-INSERT INTO Investment_transaction values ('I222');
+INSERT INTO Transaction values ('D111');
+INSERT INTO Transaction values ('I222');
 
-INSERT INTO Portfolio_action VALUES ('I222', 5, 'JohnWick', '1999-3-5', 'buy', 5, 10);
-INSERT INTO deposit_trans VALUES ('D111', 'JohnWick', '1344-6-7', 599);
+INSERT INTO Portfolio_action VALUES ('I222', 5, 'JohnWick', '2017-3-5', 'buy', 5, 10, 50);
+INSERT INTO deposit_trans VALUES ('D111', 'JohnWick', '2016-6-7', 599);
 INSERT INTO Owns VALUES (5, 'JohnWick', 10);
 INSERT INTO Prefers VALUES (5, 'JohnWick', 0.4);
