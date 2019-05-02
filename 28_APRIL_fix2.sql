@@ -58,7 +58,7 @@ CREATE TABLE Location (
 );
 
 CREATE TABLE MutualFund (
-  symbol VARCHAR(10),
+  symbol VARCHAR(20),
   company_id VARCHAR(10) NOT NULL,
   c_date DATE NOT NULL,
   t_num_shares BIGINT,
@@ -71,7 +71,7 @@ CREATE TABLE MutualFund (
 
 CREATE TABLE Closing_price (
   p_date DATE NOT NULL,
-  symbol VARCHAR(10),
+  symbol VARCHAR(20),
   price FLOAT,
   PRIMARY KEY (p_date, symbol),
   FOREIGN KEY (symbol) REFERENCES MutualFund(symbol) ON DELETE CASCADE
@@ -94,12 +94,12 @@ CREATE TABLE deposit_trans (
 
 CREATE TABLE Portfolio_action (
   trans_id VARCHAR(20),
-  symbol VARCHAR(10),
+  symbol VARCHAR(20),
   login VARCHAR(20),
   t_date DATE NOT NULL,
-  action VARCHAR CHECK (action = 'buy' OR action = 'sell'),
-  price FLOAT,
-  num_shares INT,
+  action VARCHAR CHECK (action = 'buy' OR action = 'sell')  NOT NULL,
+  price FLOAT NOT NULL ,
+  num_shares INT NOT NULL,
   amount FLOAT CHECK (amount = price * num_shares) NOT NULL,
   PRIMARY KEY (trans_id, symbol, login),
   FOREIGN KEY (symbol) REFERENCES MutualFund (symbol) ON DELETE CASCADE,
@@ -108,7 +108,7 @@ CREATE TABLE Portfolio_action (
 );
 
 CREATE TABLE Owns (
-  symbol VARCHAR(10),
+  symbol VARCHAR(20),
   login VARCHAR(20),
   shares INT,
   PRIMARY KEY (symbol, login),
@@ -117,7 +117,7 @@ CREATE TABLE Owns (
 );
 
 CREATE TABLE Prefers (
-  symbol VARCHAR(10),
+  symbol VARCHAR(20),
   login VARCHAR(20),
   percentage FLOAT CHECK (percentage > 0 AND percentage <= 1),
   PRIMARY KEY (symbol, login),
