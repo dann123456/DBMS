@@ -11,18 +11,15 @@ DROP TABLE IF EXISTS Administrator cascade;
 DROP TABLE IF EXISTS MutualFund cascade;
 DROP TABLE IF EXISTS Closing_price cascade;
 
--- Portfolio's amount added NOT NULL after check constraint
--- Updated insert statement for Location so that postcode was in NSW
--- Added amount of 50 to insert statement for Portfolio_action 
--- Added check constraint to Portfolio action CHECK (action = 'buy' OR action = 'sell')
 
 CREATE TABLE "User" (
   login VARCHAR(20),
   address VARCHAR(30),
   password VARCHAR(20),
-  email VARCHAR(30),
+  email VARCHAR(50),
   name VARCHAR(30),
-  PRIMARY KEY (login)
+  PRIMARY KEY (login),
+  UNIQUE (email)
 );
 
 CREATE TABLE Customer (
@@ -127,7 +124,7 @@ CREATE TABLE Prefers (
 
 
 --INSERT STATEMENTS
-INSERT INTO Company VALUES (1, 'thiscompany', 'Joe', 'Smith');
+INSERT INTO Company VALUES ('1', 'thiscompany', 'Joe', 'Smith');
 INSERT INTO location VALUES ('1 Wall St', '1', 'Newtown', 2042);
 
 INSERT INTO MutualFund VALUES (5, '1', '2019-3-4', 9300, 'low risk long term fund', 'Long-term-bonds', 'bonds');
