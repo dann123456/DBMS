@@ -47,13 +47,15 @@ def findUserIssues(user_id):
 
         curs = conn.cursor()
         # execute a SQL query
-        curs.execute("""SELECT * 
-        FROM a3_issue WHERE creator = %s or resolver = %s or verifier = %s ORDER BY title ASC""", (user_id, user_id, user_id))
+        sql = """SELECT * FROM a3_issue WHERE creator = %s or resolver = %s or verifier = %s ORDER BY title ASC"""
+        data = (user_id, user_id, user_id)
+        curs.execute(sql, data)
         
         # can loop through the resultset
         for result in curs:
-            issue_db.append(list(result))
-            print(list(result))
+            convert = list(map(str, result)) # convert to string for web display
+            issue_db.append(convert)
+            print(convert)
     # for illustrating close methods – calling close() on cursor and connection
     # objects will release their associated resources.
 
@@ -62,15 +64,13 @@ def findUserIssues(user_id):
         print("psycopg2.Error : " + sqle.pgerror)
 
     issue = [{
-        'title': str(row[0]),
-        'creator': str(row[1]),
-        'resolver': str(row[2]),
-        'verifier': str(row[3]),
-        'description': str(row[4]),
-        'issue_id': str(row[5])
+        'title': row[0],
+        'creator': row[1],
+        'resolver': row[2],
+        'verifier': row[3],
+        'description': row[4],
+        'issue_id': row[5]
     } for row in issue_db]
-
-
 
     curs.close()
     conn.close()
@@ -83,9 +83,7 @@ def findIssueBasedOnExpressionSearchedOnTitleAndDescription(searchString, user_i
 
     # TODO - find necessary issues using sql database based on search input
     print(user_id)
-    
     searchString = "%"+searchString+"%"
-
     print(searchString)
     
     issue_db = []
@@ -97,8 +95,9 @@ def findIssueBasedOnExpressionSearchedOnTitleAndDescription(searchString, user_i
 
         curs = conn.cursor()
         # execute a SQL query
-        curs.execute("""SELECT * 
-        FROM a3_issue WHERE title LIKE %s or description LIKE %s ORDER BY title ASC""", (searchString, searchString))
+        sql = """SELECT * FROM a3_issue WHERE title LIKE %s or description LIKE %s ORDER BY title ASC"""
+        data = (searchString, searchString)
+        curs.execute(sql, data)
         
         # can loop through the resultset
         print(curs)
