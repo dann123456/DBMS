@@ -134,8 +134,7 @@ def addIssue(title, creator, resolver, verifier, description):
     # Insert a new issue to database
     # return False if adding was unsuccessful 
     # return Ture if adding was successful
-    title = "'" + title + "'"
-    description = "'" + description + "'"
+
     try:
         # fetch connection object to connect to the database
         conn = openConnection()
@@ -143,9 +142,10 @@ def addIssue(title, creator, resolver, verifier, description):
 
         curs = conn.cursor()
 
-        sql = "INSERT INTO a3_issue (title, creator, resolver, verifier, description) VALUES (%s, %s, %s, %s, %s )" % (title, creator, resolver, verifier, description)
+        sql = """INSERT INTO a3_issue (title, creator, resolver, verifier, description) VALUES (%s, %s, %s, %s, %s )"""
+        data = (title, creator, resolver, verifier, description)
 
-        curs.execute(sql)
+        curs.execute(sql, data)
         conn.commit()
     
     except psycopg2.Error as sqle:       
