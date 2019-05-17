@@ -15,7 +15,7 @@ def openConnection():
     userid = "postgres"
     passwd = "minhdang504"
     myHost = "localhost"
-    port = "5433"
+    port = "5432"
     # Create a connection to the database
     conn = None
     try:
