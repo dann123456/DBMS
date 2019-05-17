@@ -56,9 +56,7 @@ def findUserIssues(user_id):
             convert = list(map(str, result)) # convert to string for web display
             issue_db.append(convert)
             print(convert)
-    # for illustrating close methods – calling close() on cursor and connection
-    # objects will release their associated resources.
-
+            
     except psycopg2.Error as sqle:       
         #TODO: add error handling #/
         print("psycopg2.Error : " + sqle.pgerror)
@@ -103,10 +101,7 @@ def findIssueBasedOnExpressionSearchedOnTitleAndDescription(searchString, user_i
         print(curs)
         for result in curs:
             issue_db.append(list(result))
-
-    # for illustrating close methods – calling close() on cursor and connection
-    # objects will release their associated resources.
-
+            
     except psycopg2.Error as sqle:       
         #TODO: add error handling #/
         print("psycopg2.Error : " + sqle.pgerror)
