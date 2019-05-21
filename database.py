@@ -36,28 +36,32 @@ List all the user associated issues in the database for a given user
 See assignment description for how to load user associated issues based on the user id (user_id)
 '''
 def findUserIssues(user_id):
-    # TODO - list all user associated issues from db using sql
     print(user_id)
     issue_db = []
-
     try:
         # fetch connection object to connect to the database
         conn = openConnection()
         # fetch cursor prepare to query the database
 
         curs = conn.cursor()
-        # execute a SQL query
-        sql = """SELECT * FROM a3_issue WHERE creator = %s or resolver = %s or verifier = %s ORDER BY title ASC"""
-        data = (user_id, user_id, user_id)
-        curs.execute(sql, data)
-        
-        # can loop through the resultset
-        for result in curs:
-            convert = list(map(str, result)) # convert to string for web display
+        curs.execute("BEGIN;")
+        curs.callproc('ListIssue', [int(user_id)])
+
+        # loop through the resultset #/
+        nr = 0
+        row = curs.fetchone()
+
+        while row is not None:
+            nr+=1
+            convert = list(map(str, row)) # convert to string for web display
             issue_db.append(convert)
-            print(convert)
-            
-    except psycopg2.Error as sqle:       
+            row = curs.fetchone()
+          
+        if ( nr == 0 ):
+            print("No entries found.")
+
+    except psycopg2.Error as sqle:
+
         #TODO: add error handling #/
         print("psycopg2.Error : " + sqle.pgerror)
 
@@ -73,6 +77,7 @@ def findUserIssues(user_id):
     curs.close()
     conn.close()
     return issue
+
 
 '''
 Find the associated issues for the user with the given userId (user_id) based on the searchString provided as the parameter, and based on the assignment description
