@@ -15,7 +15,7 @@ def openConnection():
     userid = "postgres"
     passwd = "minhdang504"
     myHost = "localhost"
-    port = "5432"
+    port = "5433"
     # Create a connection to the database
     conn = None
     try:
@@ -53,7 +53,8 @@ def findUserIssues(user_id):
 
         while row is not None:
             nr+=1
-            convert = list(map(str, row)) # convert to string for web display
+            # convert to string for web display
+            convert = list(map(str, row))
             issue_db.append(convert)
             row = curs.fetchone()
           
@@ -98,8 +99,10 @@ def findIssueBasedOnExpressionSearchedOnTitleAndDescription(searchString, user_i
 
         curs = conn.cursor()
         # execute a SQL query
-        sql = """SELECT * FROM a3_issue WHERE title LIKE %s or description LIKE %s ORDER BY title ASC"""
-        data = (searchString, searchString)
+        sql = """SELECT * FROM a3_issue WHERE (title LIKE %s or description LIKE %s) 
+                 and (creator = %s or resolver = %s or verifier = %s) 
+                 ORDER BY title ASC"""
+        data = (searchString, searchString, user_id, user_id, user_id)
         curs.execute(sql, data)
         
         # can loop through the resultset
