@@ -12,10 +12,10 @@ Connects to the database using the connection string
 '''
 def openConnection():
 # connection parameters - ENTER YOUR LOGIN AND PASSWORD HERE
-    userid = "postgres"
-    passwd = "minhdang504"
-    myHost = "localhost"
-    port = "5433"
+    userid = "y19s1c9120_mdin6872"
+    passwd = "pwd"
+    myHost = "soit-db-pro-2.ucc.usyd.edu.au"
+
     # Create a connection to the database
     conn = None
     try:
@@ -23,8 +23,7 @@ def openConnection():
         conn = psycopg2.connect(database=userid,
                                     user=userid,
                                     password=passwd,
-                                    host=myHost,
-                                    port = port)
+                                    host=myHost)
     except psycopg2.Error as sqle:
         print("psycopg2.Error : " + sqle.pgerror)
     
@@ -45,7 +44,7 @@ def findUserIssues(user_id):
 
         curs = conn.cursor()
         curs.execute("BEGIN;")
-        curs.callproc('ListIssue', [int(user_id)])
+        curs.callproc('listIssue', [int(user_id)])
 
         # loop through the resultset #/
         nr = 0
